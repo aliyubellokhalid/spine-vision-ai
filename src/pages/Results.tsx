@@ -196,7 +196,7 @@ const Results = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gradient-to-br from-medical-primary/5 to-medical-secondary/5 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
           <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4 animate-pulse">
@@ -214,7 +214,7 @@ const Results = () => {
   if (!results) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gradient-to-br from-medical-primary/5 to-medical-secondary/5 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
           <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4">
@@ -234,7 +234,8 @@ const Results = () => {
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+        <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4">
@@ -480,6 +481,7 @@ const Results = () => {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </Layout>
   );
