@@ -199,6 +199,63 @@ export class SupabaseService {
     return data.publicUrl;
   }
 
+  // Data Photos Bucket Storage
+  async uploadDataPhoto(file: File, patientId: string, analysisId?: string): Promise<string> {
+    const timestamp = Date.now();
+    const fileName = `${patientId}_${timestamp}_${file.name}`;
+    const filePath = analysisId ? `analyses/${analysisId}/${fileName}` : `patients/${patientId}/${fileName}`;
+
+    console.log('Uploading to data-photos bucket:', filePath);
+
+    const { data, error } = await supabase.storage
+      .from('data-photos')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Upload error:', error);
+      throw new Error(`Failed to upload photo: ${error.message}`);
+    }
+
+    console.log('Upload successful:', data);
+    return data.path;
+  }
+
+  async getDataPhotoUrl(filePath: string): Promise<string> {
+    const { data } = supabase.storage
+      .from('data-photos')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  }
+
+  async deleteDataPhoto(filePath: string): Promise<void> {
+    const { error } = await supabase.storage
+      .from('data-photos')
+      .remove([filePath]);
+
+    if (error) {
+      throw new Error(`Failed to delete photo: ${error.message}`);
+    }
+  }
+
+  async listDataPhotos(patientId: string): Promise<string[]> {
+    const { data, error } = await supabase.storage
+      .from('data-photos')
+      .list(`patients/${patientId}`, {
+        limit: 100,
+        offset: 0
+      });
+
+    if (error) {
+      throw new Error(`Failed to list photos: ${error.message}`);
+    }
+
+    return data?.map(file => `patients/${patientId}/${file.name}`) || [];
+  }
+
   // Statistics and Analytics
   async getAnalysisStats(): Promise<{
     totalAnalyses: number;

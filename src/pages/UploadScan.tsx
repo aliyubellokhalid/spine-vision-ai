@@ -106,6 +106,20 @@ const UploadScan = () => {
       const apiWorking = await testOpenAIConnection();
       console.log('OpenAI API working:', apiWorking);
       
+      // Upload file to Supabase bucket first
+      console.log('Uploading file to data-photos bucket...');
+      let uploadedFilePath;
+      try {
+        uploadedFilePath = await supabaseService.uploadDataPhoto(
+          uploadedFile, 
+          currentPatient.patientId || currentPatient.patient_id || 'unknown'
+        );
+        console.log('File uploaded to bucket:', uploadedFilePath);
+      } catch (uploadError) {
+        console.warn('Bucket upload failed, continuing with analysis:', uploadError);
+        // Continue with analysis even if upload fails
+      }
+
       // Perform real OpenAI analysis
       console.log('Starting OpenAI analysis with file:', uploadedFile.name, 'size:', uploadedFile.size);
       console.log('Clinical info:', formData.clinicalInfo);
