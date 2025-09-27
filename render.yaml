@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: spine-vision-ai
+    env: static
+    buildCommand: npm run build
+    startCommand: npm start
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: VITE_OPENAI_API_KEY
+        sync: false
