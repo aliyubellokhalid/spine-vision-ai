@@ -196,7 +196,7 @@ const Results = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-purple-800 p-4">
           <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4 animate-pulse">
@@ -214,7 +214,7 @@ const Results = () => {
   if (!results) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-purple-800 p-4">
           <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4">
@@ -234,7 +234,7 @@ const Results = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 to-purple-800 p-4">
         <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -246,7 +246,7 @@ const Results = () => {
         </div>
 
         {/* Patient Information */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <FileText className="w-5 h-5" />
@@ -270,7 +270,7 @@ const Results = () => {
         </Card>
 
         {/* Overall Assessment */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <CheckCircle className="w-5 h-5" />
@@ -292,7 +292,7 @@ const Results = () => {
         </Card>
 
         {/* General Observations */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <Brain className="w-5 h-5" />
@@ -325,7 +325,7 @@ const Results = () => {
         </Card>
 
         {/* Pathology Findings */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <AlertTriangle className="w-5 h-5" />
@@ -374,7 +374,7 @@ const Results = () => {
         </Card>
 
         {/* Possible Conditions */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <AlertTriangle className="w-5 h-5" />
@@ -395,7 +395,7 @@ const Results = () => {
         </Card>
 
         {/* Clinical Implications */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <Brain className="w-5 h-5" />
@@ -409,7 +409,7 @@ const Results = () => {
         </Card>
 
         {/* Clinical Recommendations */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <CheckCircle className="w-5 h-5" />
@@ -430,7 +430,7 @@ const Results = () => {
         </Card>
 
         {/* Next Steps */}
-        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+        <Card className="bg-white/90 backdrop-blur-sm border-medical-primary/20 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-medical-primary">
               <Calendar className="w-5 h-5" />
@@ -481,7 +481,6 @@ const Results = () => {
             </div>
           </CardContent>
         </Card>
-        </div>
       </div>
     </Layout>
   );
