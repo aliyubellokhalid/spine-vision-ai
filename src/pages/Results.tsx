@@ -6,6 +6,7 @@ import { Brain, AlertTriangle, CheckCircle, FileText, Download, Share2, Calendar
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabaseService } from "@/services/supabaseService";
+import EnvTest from "@/components/EnvTest";
 
 interface Finding {
   pathology: string;
@@ -180,6 +181,7 @@ const Results = () => {
 
   return (
     <Layout>
+      <EnvTest />
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
