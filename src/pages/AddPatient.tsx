@@ -8,6 +8,7 @@ import { Users, Calendar, Phone, User, Building2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabaseService } from "@/services/supabaseService";
 
 const AddPatient = () => {
   const { toast } = useToast();
@@ -27,7 +28,7 @@ const AddPatient = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -40,16 +41,40 @@ const AddPatient = () => {
       return;
     }
 
-    // Store patient data (in a real app, this would go to a backend)
-    localStorage.setItem('currentPatient', JSON.stringify(formData));
-    
-    toast({
-      title: "Patient Added Successfully",
-      description: `${formData.patientName} has been registered in the system.`,
-    });
+    try {
+      // Try to save patient to Supabase first
+      try {
+        await supabaseService.createPatient({
+          patient_id: formData.patientId,
+          patient_name: formData.patientName,
+          age: parseInt(formData.age),
+          gender: formData.gender || 'Not specified'
+        });
+        console.log('Patient saved to Supabase successfully');
+      } catch (supabaseError) {
+        console.warn('Supabase save failed, using localStorage fallback:', supabaseError);
+        // Continue with localStorage fallback
+      }
 
-    // Navigate to upload scan page
-    navigate('/upload-scan');
+      // Always store patient data locally for immediate use
+      localStorage.setItem('currentPatient', JSON.stringify(formData));
+      
+      toast({
+        title: "Patient Added Successfully",
+        description: `${formData.patientName} has been registered in the system.`,
+      });
+
+      // Navigate to upload scan page
+      navigate('/upload-scan');
+
+    } catch (error) {
+      console.error('Error saving patient:', error);
+      toast({
+        title: "Error Saving Patient",
+        description: error instanceof Error ? error.message : "Failed to save patient. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

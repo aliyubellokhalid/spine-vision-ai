@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Brain, AlertTriangle, CheckCircle, FileText, Download, Share2, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabaseService } from "@/services/supabaseService";
 
 interface Finding {
   pathology: string;
@@ -12,26 +13,113 @@ interface Finding {
   severity: string;
   confidence: number;
   description: string;
+  clinicalSignificance: string;
+}
+
+interface GeneralObservations {
+  spinalAlignment: string;
+  discSpaces: string;
+  discHeight: string;
+  spinalCanal: string;
+  overallAppearance: string;
 }
 
 interface AnalysisResults {
   patientId: string;
   patientName: string;
   scanDate: string;
+  generalObservations: GeneralObservations;
   findings: Finding[];
+  possibleConditions: string[];
+  clinicalImplications: string;
   overallAssessment: string;
   recommendations: string[];
+  nextSteps: string[];
 }
 
 const Results = () => {
   const navigate = useNavigate();
   const [results, setResults] = useState<AnalysisResults | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedResults = localStorage.getItem('analysisResults');
-    if (storedResults) {
-      setResults(JSON.parse(storedResults));
-    }
+    const loadResults = async () => {
+      try {
+        console.log('Loading results...');
+        // First try to load from localStorage (for immediate display)
+        const storedResults = localStorage.getItem('analysisResults');
+        console.log('Stored results from localStorage:', storedResults);
+        if (storedResults) {
+          const parsedResults = JSON.parse(storedResults);
+          console.log('Parsed results:', parsedResults);
+          console.log('General observations:', parsedResults.generalObservations);
+          console.log('Findings count:', parsedResults.findings?.length || 0);
+          setResults(parsedResults);
+        }
+
+        // Then try to load from Supabase using the analysis ID
+        const analysisId = localStorage.getItem('currentAnalysisId');
+        if (analysisId) {
+          try {
+            const supabaseResults = await supabaseService.getAnalysis(analysisId);
+            if (supabaseResults) {
+              // Convert Supabase format to our interface
+              const convertedResults: AnalysisResults = {
+                patientId: supabaseResults.patient_id,
+                patientName: supabaseResults.patient_id, // We'll need to fetch patient name separately
+                scanDate: supabaseResults.scan_date,
+                generalObservations: supabaseResults.general_observations || {
+                  spinalAlignment: 'Not specified',
+                  discSpaces: 'Not specified',
+                  discHeight: 'Not specified',
+                  spinalCanal: 'Not specified',
+                  overallAppearance: 'Not specified'
+                },
+                findings: supabaseResults.findings || [],
+                possibleConditions: supabaseResults.possible_conditions || [],
+                clinicalImplications: supabaseResults.clinical_implications || 'Not specified',
+                overallAssessment: supabaseResults.overall_assessment,
+                recommendations: supabaseResults.recommendations,
+                nextSteps: supabaseResults.next_steps || []
+              };
+              setResults(convertedResults);
+            }
+          } catch (error) {
+            console.warn('Failed to load from Supabase, checking localStorage fallback:', error);
+            // Try to load from localStorage fallback
+            const fallbackAnalysis = localStorage.getItem('fallbackAnalysis');
+            if (fallbackAnalysis) {
+              const fallbackData = JSON.parse(fallbackAnalysis);
+              const convertedResults: AnalysisResults = {
+                patientId: fallbackData.patient_id,
+                patientName: fallbackData.patient_id,
+                scanDate: fallbackData.scan_date,
+                generalObservations: fallbackData.generalObservations || fallbackData.general_observations || {
+                  spinalAlignment: 'Not specified',
+                  discSpaces: 'Not specified',
+                  discHeight: 'Not specified',
+                  spinalCanal: 'Not specified',
+                  overallAppearance: 'Not specified'
+                },
+                findings: fallbackData.findings || [],
+                possibleConditions: fallbackData.possibleConditions || fallbackData.possible_conditions || [],
+                clinicalImplications: fallbackData.clinicalImplications || fallbackData.clinical_implications || 'Not specified',
+                overallAssessment: fallbackData.overall_assessment,
+                recommendations: fallbackData.recommendations || [],
+                nextSteps: fallbackData.nextSteps || fallbackData.next_steps || []
+              };
+              setResults(convertedResults);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading results:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadResults();
   }, []);
 
   const getSeverityColor = (severity: string) => {
@@ -52,6 +140,24 @@ const Results = () => {
       ? 'bg-medical-success/20 text-medical-success'
       : 'bg-medical-warning/20 text-medical-warning';
   };
+
+  console.log('Results component rendering, loading:', loading, 'results:', results);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="max-w-2xl mx-auto text-center py-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4">
+            <Brain className="w-8 h-8 text-white animate-pulse" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Loading Results...</h1>
+          <p className="text-muted-foreground">
+            Please wait while we load your analysis results.
+          </p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!results) {
     return (
@@ -132,6 +238,47 @@ const Results = () => {
           </Card>
         </div>
 
+        {/* General Observations */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-medical-primary" />
+              General Observations
+            </CardTitle>
+            <CardDescription>
+              Overall assessment of spinal structure and appearance
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-foreground mb-2">Spinal Alignment</h4>
+                  <p className="text-sm text-muted-foreground">{results.generalObservations.spinalAlignment}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-foreground mb-2">Disc Spaces</h4>
+                  <p className="text-sm text-muted-foreground">{results.generalObservations.discSpaces}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-foreground mb-2">Disc Height</h4>
+                  <p className="text-sm text-muted-foreground">{results.generalObservations.discHeight}</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-foreground mb-2">Spinal Canal</h4>
+                  <p className="text-sm text-muted-foreground">{results.generalObservations.spinalCanal}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-foreground mb-2">Overall Appearance</h4>
+                  <p className="text-sm text-muted-foreground">{results.generalObservations.overallAppearance}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Findings */}
         <Card>
           <CardHeader>
@@ -166,8 +313,9 @@ const Results = () => {
                     </div>
                   </div>
                   
-                  <div className="bg-secondary/50 rounded-lg p-4">
-                    <p className="text-sm text-foreground">{finding.description}</p>
+                  <div className="bg-secondary/50 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-foreground mb-2">{finding.description}</p>
+                    <p className="text-sm text-medical-primary font-medium">{finding.clinicalSignificance}</p>
                   </div>
                   
                   {/* Confidence Bar */}
@@ -185,6 +333,49 @@ const Results = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Possible Conditions */}
+        {results.possibleConditions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-medical-warning" />
+                Possible Conditions Indicated
+              </CardTitle>
+              <CardDescription>
+                Conditions that may be indicated by the findings
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {results.possibleConditions.map((condition, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-medical-warning rounded-full mt-2"></div>
+                    <p className="text-foreground">{condition}</p>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Clinical Implications */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-medical-primary" />
+              Clinical Implications
+            </CardTitle>
+            <CardDescription>
+              What these findings mean for the patient's condition
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-medical-primary/10 rounded-lg p-4">
+              <p className="text-foreground">{results.clinicalImplications}</p>
             </div>
           </CardContent>
         </Card>
@@ -211,6 +402,31 @@ const Results = () => {
             </ul>
           </CardContent>
         </Card>
+
+        {/* Next Steps */}
+        {results.nextSteps.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-medical-primary" />
+                Recommended Next Steps
+              </CardTitle>
+              <CardDescription>
+                Suggested actions for follow-up care
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {results.nextSteps.map((step, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-medical-success rounded-full mt-2"></div>
+                    <p className="text-foreground">{step}</p>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -14,7 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      patients: {
+        Row: {
+          id: string
+          patient_id: string
+          patient_name: string
+          age: number
+          gender: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          patient_id: string
+          patient_name: string
+          age: number
+          gender: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          patient_id?: string
+          patient_name?: string
+          age?: number
+          gender?: string
+          created_at?: string
+        }
+      }
+      scan_analyses: {
+        Row: {
+          id: string
+          patient_id: string
+          scan_date: string
+          examination_type: string
+          clinical_info: string | null
+          findings: Json
+          overall_assessment: string
+          recommendations: string[]
+          ai_confidence: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          patient_id: string
+          scan_date: string
+          examination_type: string
+          clinical_info?: string | null
+          findings: Json
+          overall_assessment: string
+          recommendations: string[]
+          ai_confidence: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          patient_id?: string
+          scan_date?: string
+          examination_type?: string
+          clinical_info?: string | null
+          findings?: Json
+          overall_assessment?: string
+          recommendations?: string[]
+          ai_confidence?: number
+          created_at?: string
+        }
+      }
+      feedback: {
+        Row: {
+          id: string
+          analysis_id: string
+          feedback_text: string
+          rating: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          analysis_id: string
+          feedback_text: string
+          rating: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          analysis_id?: string
+          feedback_text?: string
+          rating?: number
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

@@ -8,6 +8,8 @@ import { Upload, FileImage, Brain, AlertCircle, CheckCircle } from "lucide-react
 import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { openaiService, testOpenAIConnection } from "@/services/openaiService";
+import { supabaseService } from "@/services/supabaseService";
 
 const UploadScan = () => {
   const { toast } = useToast();
@@ -86,46 +88,108 @@ const UploadScan = () => {
     }
   };
 
-  const simulateAIAnalysis = async () => {
+  const performAIAnalysis = async () => {
+    if (!uploadedFile) {
+      toast({
+        title: "No File Selected",
+        description: "Please upload an MRI scan before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsAnalyzing(true);
     
-    // Simulate AI processing time
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Mock analysis results
-    const mockResults = {
-      patientId: currentPatient.patientId || 'Unknown',
-      patientName: currentPatient.patientName || 'Unknown Patient',
-      scanDate: new Date().toISOString(),
-      findings: [
-        {
-          pathology: "Disc Herniation",
-          level: "L4-L5",
-          severity: "Moderate",
-          confidence: 94.5,
-          description: "Posterior disc herniation with mild neural foraminal narrowing"
-        }
-      ],
-      overallAssessment: "Pathology Detected",
-      recommendations: [
-        "Consider conservative treatment with physical therapy",
-        "Monitor symptoms and reassess in 6-8 weeks",
-        "MRI follow-up if symptoms worsen"
-      ]
-    };
-    
-    // Store results
-    localStorage.setItem('analysisResults', JSON.stringify(mockResults));
-    
-    setIsAnalyzing(false);
-    
-    toast({
-      title: "Analysis Complete",
-      description: "AI analysis completed successfully. Redirecting to results...",
-    });
-    
-    // Navigate to results page
-    setTimeout(() => navigate('/results'), 1000);
+    try {
+      // Test OpenAI connection first
+      console.log('Testing OpenAI API connection...');
+      const apiWorking = await testOpenAIConnection();
+      console.log('OpenAI API working:', apiWorking);
+      
+      // Perform real OpenAI analysis
+      console.log('Starting OpenAI analysis with file:', uploadedFile.name, 'size:', uploadedFile.size);
+      console.log('Clinical info:', formData.clinicalInfo);
+      
+      const analysisResults = await openaiService.analyzeSpineMRI(
+        uploadedFile, 
+        formData.clinicalInfo
+      );
+      
+      console.log('Analysis results received:', analysisResults);
+
+      // Calculate average confidence
+      const avgConfidence = analysisResults.findings.length > 0 
+        ? analysisResults.findings.reduce((sum, finding) => sum + finding.confidence, 0) / analysisResults.findings.length
+        : 0;
+
+      // Try to save to Supabase, with fallback to localStorage
+      let savedAnalysis;
+      try {
+        savedAnalysis = await supabaseService.saveAnalysis({
+          patient_id: analysisResults.patientId,
+          scan_date: analysisResults.scanDate,
+          examination_type: formData.examination || 'Spine MRI',
+          clinical_info: formData.clinicalInfo || null,
+          general_observations: analysisResults.generalObservations,
+          findings: analysisResults.findings,
+          possible_conditions: analysisResults.possibleConditions,
+          clinical_implications: analysisResults.clinicalImplications,
+          overall_assessment: analysisResults.overallAssessment,
+          recommendations: analysisResults.recommendations,
+          next_steps: analysisResults.nextSteps,
+          ai_confidence: avgConfidence
+        });
+        console.log('Analysis saved to Supabase successfully');
+      } catch (supabaseError) {
+        console.warn('Supabase save failed, using localStorage fallback:', supabaseError);
+        // Create a fallback analysis object
+        savedAnalysis = {
+          id: crypto.randomUUID(),
+          patient_id: analysisResults.patientId,
+          scan_date: analysisResults.scanDate,
+          examination_type: formData.examination || 'Spine MRI',
+          clinical_info: formData.clinicalInfo || null,
+          general_observations: analysisResults.generalObservations,
+          findings: analysisResults.findings,
+          possible_conditions: analysisResults.possibleConditions,
+          clinical_implications: analysisResults.clinicalImplications,
+          overall_assessment: analysisResults.overallAssessment,
+          recommendations: analysisResults.recommendations,
+          next_steps: analysisResults.nextSteps,
+          ai_confidence: avgConfidence,
+          analysis_version: '2.0',
+          created_at: new Date().toISOString()
+        };
+        // Store in localStorage as fallback
+        localStorage.setItem('fallbackAnalysis', JSON.stringify(savedAnalysis));
+      }
+
+      // Store results locally for immediate display
+      console.log('Storing analysis results in localStorage:', analysisResults);
+      localStorage.setItem('analysisResults', JSON.stringify(analysisResults));
+      localStorage.setItem('currentAnalysisId', savedAnalysis.id);
+      console.log('Analysis results stored successfully');
+
+      setIsAnalyzing(false);
+      
+      toast({
+        title: "Analysis Complete",
+        description: "AI analysis completed successfully. Redirecting to results...",
+      });
+      
+      // Navigate to results page
+      setTimeout(() => navigate('/results'), 1000);
+
+    } catch (error) {
+      setIsAnalyzing(false);
+      console.error('Analysis error:', error);
+      
+      toast({
+        title: "Analysis Failed",
+        description: error instanceof Error ? error.message : "Failed to analyze the MRI scan. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -150,7 +214,7 @@ const UploadScan = () => {
       return;
     }
 
-    await simulateAIAnalysis();
+    await performAIAnalysis();
   };
 
   return (
