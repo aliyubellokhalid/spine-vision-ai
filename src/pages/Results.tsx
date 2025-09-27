@@ -196,14 +196,16 @@ const Results = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="max-w-2xl mx-auto text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4">
-            <Brain className="w-8 h-8 text-white animate-pulse" />
+        <div className="min-h-screen bg-gradient-to-br from-medical-primary/5 to-medical-secondary/5 p-4">
+          <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4 animate-pulse">
+                <Brain className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-medical-primary mb-2">Loading Analysis Results</h2>
+              <p className="text-medical-muted">Please wait while we process your MRI analysis...</p>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Loading Results...</h1>
-          <p className="text-muted-foreground">
-            Please wait while we load your analysis results.
-          </p>
         </div>
       </Layout>
     );
@@ -212,17 +214,19 @@ const Results = () => {
   if (!results) {
     return (
       <Layout>
-        <div className="max-w-2xl mx-auto text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
-            <FileText className="w-8 h-8 text-muted-foreground" />
+        <div className="min-h-screen bg-gradient-to-br from-medical-primary/5 to-medical-secondary/5 p-4">
+          <div className="max-w-6xl mx-auto flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4">
+                <AlertTriangle className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-medical-primary mb-2">No Analysis Results Found</h2>
+              <p className="text-medical-muted mb-6">We couldn't find any analysis results for this session.</p>
+              <Button onClick={() => navigate('/upload')} className="bg-gradient-medical">
+                Start New Analysis
+              </Button>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">No Results Available</h1>
-          <p className="text-muted-foreground mb-6">
-            No analysis results found. Please upload and analyze an MRI scan first.
-          </p>
-          <Button onClick={() => navigate('/upload-scan')} className="bg-gradient-medical">
-            Upload MRI Scan
-          </Button>
         </div>
       </Layout>
     );
@@ -236,217 +240,188 @@ const Results = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-medical rounded-full mb-4">
             <Brain className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">AI Analysis Results</h1>
-          <p className="text-muted-foreground">Comprehensive spine MRI pathology analysis</p>
+          <h1 className="text-4xl font-bold text-medical-primary mb-2">AI Analysis Results</h1>
+          <p className="text-lg text-medical-muted">Comprehensive spine MRI pathology analysis</p>
         </div>
 
-        {/* Patient & Scan Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Patient Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Name:</span>
-                <span className="font-medium">{results.patientName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Patient ID:</span>
-                <span className="font-medium">{results.patientId}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Scan Date:</span>
-                <span className="font-medium">
-                  {new Date(results.scanDate).toLocaleDateString()}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Overall Assessment</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3">
-                {results.overallAssessment === 'Normal' ? (
-                  <CheckCircle className="w-8 h-8 text-medical-success" />
-                ) : (
-                  <AlertTriangle className="w-8 h-8 text-medical-warning" />
-                )}
-                <div>
-                  <Badge className={getAssessmentColor(results.overallAssessment)}>
-                    {results.overallAssessment}
-                  </Badge>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {results.findings.length} finding(s) detected
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* General Observations */}
-        <Card>
+        {/* Patient Information */}
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-medical-primary" />
-              General Observations
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <FileText className="w-5 h-5" />
+              Patient Information
             </CardTitle>
-            <CardDescription>
-              Overall assessment of spinal structure and appearance
-            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium text-medical-muted">Name:</label>
+              <p className="text-lg font-semibold text-medical-primary">{results.patientName}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-medical-muted">Patient ID:</label>
+              <p className="text-lg font-semibold text-medical-primary">{results.patientId}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-medical-muted">Scan Date:</label>
+              <p className="text-lg font-semibold text-medical-primary">{new Date(results.scanDate).toLocaleDateString()}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Overall Assessment */}
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <CheckCircle className="w-5 h-5" />
+              Overall Assessment
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Spinal Alignment</h4>
-                  <p className="text-sm text-muted-foreground">{results.generalObservations.spinalAlignment}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Disc Spaces</h4>
-                  <p className="text-sm text-muted-foreground">{results.generalObservations.discSpaces}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Disc Height</h4>
-                  <p className="text-sm text-muted-foreground">{results.generalObservations.discHeight}</p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Spinal Canal</h4>
-                  <p className="text-sm text-muted-foreground">{results.generalObservations.spinalCanal}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium text-foreground mb-2">Overall Appearance</h4>
-                  <p className="text-sm text-muted-foreground">{results.generalObservations.overallAppearance}</p>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <Badge className={`${getAssessmentColor(results.overallAssessment)} text-lg px-4 py-2`}>
+                  {results.overallAssessment}
+                </Badge>
+                <p className="text-sm text-medical-muted mt-2">
+                  {results.findings.length} finding(s) detected
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Findings */}
-        <Card>
+        {/* General Observations */}
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="w-5 h-5 text-medical-primary" />
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <Brain className="w-5 h-5" />
+              General Observations
+            </CardTitle>
+            <CardDescription>Overall assessment of spinal structure and appearance</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-medical-primary mb-2">Spinal Alignment</h4>
+              <p className="text-medical-muted">{results.generalObservations.spinalAlignment}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-medical-primary mb-2">Disc Spaces</h4>
+              <p className="text-medical-muted">{results.generalObservations.discSpaces}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-medical-primary mb-2">Disc Height</h4>
+              <p className="text-medical-muted">{results.generalObservations.discHeight}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-medical-primary mb-2">Spinal Canal</h4>
+              <p className="text-medical-muted">{results.generalObservations.spinalCanal}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-medical-primary mb-2">Overall Appearance</h4>
+              <p className="text-medical-muted">{results.generalObservations.overallAppearance}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Pathology Findings */}
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <AlertTriangle className="w-5 h-5" />
               Pathology Findings
             </CardTitle>
-            <CardDescription>
-              Detailed analysis of detected spine pathologies
-            </CardDescription>
+            <CardDescription>Detailed analysis of detected spine pathologies</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {results.findings.map((finding, index) => (
-                <div key={index} className="border border-border rounded-lg p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {finding.pathology}
-                      </h3>
-                      <p className="text-muted-foreground">
-                        Level: {finding.level}
-                      </p>
-                    </div>
-                    <div className="text-right space-y-2">
-                      <Badge className={getSeverityColor(finding.severity)}>
-                        {finding.severity}
-                      </Badge>
-                      <div className="text-sm text-muted-foreground">
-                        Confidence: {finding.confidence}%
-                      </div>
-                    </div>
+          <CardContent className="space-y-6">
+            {results.findings.map((finding, index) => (
+              <div key={index} className="border border-medical-primary/20 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-lg font-semibold text-medical-primary">{finding.pathology}</h4>
+                  <Badge className={getSeverityColor(finding.severity)}>
+                    {finding.severity}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <label className="text-sm font-medium text-medical-muted">Level:</label>
+                    <p className="font-semibold text-medical-primary">{finding.level}</p>
                   </div>
-                  
-                  <div className="bg-secondary/50 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-foreground mb-2">{finding.description}</p>
-                    <p className="text-sm text-medical-primary font-medium">{finding.clinicalSignificance}</p>
-                  </div>
-                  
-                  {/* Confidence Bar */}
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">AI Confidence</span>
-                      <span className="font-medium">{finding.confidence}%</span>
-                    </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div 
-                        className="bg-gradient-medical h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${finding.confidence}%` }}
-                      ></div>
-                    </div>
+                  <div>
+                    <label className="text-sm font-medium text-medical-muted">Confidence:</label>
+                    <p className="font-semibold text-medical-primary">{finding.confidence}%</p>
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="mb-3">
+                  <label className="text-sm font-medium text-medical-muted">Description:</label>
+                  <p className="text-medical-muted mt-1">{finding.description}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-medical-muted">Clinical Significance:</label>
+                  <p className="text-medical-muted mt-1">{finding.clinicalSignificance}</p>
+                </div>
+                <div className="mt-3 pt-3 border-t border-medical-primary/10">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-medical-muted">AI Confidence:</span>
+                    <Badge variant="outline" className="text-medical-primary">
+                      {finding.confidence}%
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
         {/* Possible Conditions */}
-        {results.possibleConditions.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-medical-warning" />
-                Possible Conditions Indicated
-              </CardTitle>
-              <CardDescription>
-                Conditions that may be indicated by the findings
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {results.possibleConditions.map((condition, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-medical-warning rounded-full mt-2"></div>
-                    <p className="text-foreground">{condition}</p>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Clinical Implications */}
-        <Card>
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-medical-primary" />
-              Clinical Implications
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <AlertTriangle className="w-5 h-5" />
+              Possible Conditions Indicated
             </CardTitle>
-            <CardDescription>
-              What these findings mean for the patient's condition
-            </CardDescription>
+            <CardDescription>Conditions that may be indicated by the findings</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="bg-medical-primary/10 rounded-lg p-4">
-              <p className="text-foreground">{results.clinicalImplications}</p>
-            </div>
+            <ul className="space-y-2">
+              {results.possibleConditions.map((condition, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <div className="w-2 h-2 bg-medical-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-medical-muted">{condition}</span>
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
 
-        {/* Recommendations */}
-        <Card>
+        {/* Clinical Implications */}
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-medical-primary" />
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <Brain className="w-5 h-5" />
+              Clinical Implications
+            </CardTitle>
+            <CardDescription>What these findings mean for the patient's condition</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-medical-muted leading-relaxed">{results.clinicalImplications}</p>
+          </CardContent>
+        </Card>
+
+        {/* Clinical Recommendations */}
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <CheckCircle className="w-5 h-5" />
               Clinical Recommendations
             </CardTitle>
-            <CardDescription>
-              AI-generated recommendations based on findings
-            </CardDescription>
+            <CardDescription>AI-generated recommendations based on findings</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               {results.recommendations.map((recommendation, index) => (
                 <li key={index} className="flex items-start gap-3">
-                  <div className="w-2 h-2 bg-medical-primary rounded-full mt-2"></div>
-                  <p className="text-foreground">{recommendation}</p>
+                  <div className="w-2 h-2 bg-medical-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-medical-muted">{recommendation}</span>
                 </li>
               ))}
             </ul>
@@ -454,61 +429,52 @@ const Results = () => {
         </Card>
 
         {/* Next Steps */}
-        {results.nextSteps.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-medical-primary" />
-                Recommended Next Steps
-              </CardTitle>
-              <CardDescription>
-                Suggested actions for follow-up care
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {results.nextSteps.map((step, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-medical-success rounded-full mt-2"></div>
-                    <p className="text-foreground">{step}</p>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
+        <Card className="bg-white/80 backdrop-blur-sm border-medical-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-medical-primary">
+              <Calendar className="w-5 h-5" />
+              Recommended Next Steps
+            </CardTitle>
+            <CardDescription>Suggested actions for follow-up care</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {results.nextSteps.map((step, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <div className="w-2 h-2 bg-medical-primary rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-medical-muted">{step}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button variant="outline" size="lg" className="flex items-center gap-2">
-            <Download className="w-5 h-5" />
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button className="bg-gradient-medical text-white hover:opacity-90">
+            <Download className="w-4 h-4 mr-2" />
             Download Report
           </Button>
-          <Button variant="outline" size="lg" className="flex items-center gap-2">
-            <Share2 className="w-5 h-5" />
+          <Button variant="outline" className="border-medical-primary text-medical-primary hover:bg-medical-primary/10">
+            <Share2 className="w-4 h-4 mr-2" />
             Share Results
           </Button>
-          <Button 
-            onClick={() => navigate('/feedback')} 
-            className="bg-gradient-medical hover:opacity-90"
-            size="lg"
-          >
-            <Calendar className="w-5 h-5 mr-2" />
+          <Button variant="outline" className="border-medical-primary text-medical-primary hover:bg-medical-primary/10">
+            <Brain className="w-4 h-4 mr-2" />
             Provide Feedback
           </Button>
         </div>
 
-        {/* Disclaimer */}
-        <Card className="border-medical-warning/20 bg-medical-warning/5">
+        {/* Medical Disclaimer */}
+        <Card className="bg-amber-50 border-amber-200">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-medical-warning mt-0.5" />
-              <div className="space-y-1 text-sm">
-                <p className="font-medium text-foreground">Medical Disclaimer</p>
-                <p className="text-muted-foreground">
-                  This AI analysis is intended for clinical decision support only and should not replace 
-                  professional medical judgment. All findings should be verified by a qualified radiologist 
-                  or medical professional before making treatment decisions.
+              <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="font-semibold text-amber-800 mb-2">Medical Disclaimer</h4>
+                <p className="text-sm text-amber-700 leading-relaxed">
+                  This AI analysis is intended for clinical decision support only and should not replace professional medical judgment. 
+                  All findings should be verified by a qualified radiologist or medical professional before making treatment decisions.
                 </p>
               </div>
             </div>
