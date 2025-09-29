@@ -1,40 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
-export interface Patient {
-  id?: string;
-  patient_id: string;
-  patient_name: string;
-  age: number;
-  gender: string;
-  created_at?: string;
-}
+type Patient = Database['public']['Tables']['patients']['Row'];
+type PatientInsert = Database['public']['Tables']['patients']['Insert'];
+type PatientUpdate = Database['public']['Tables']['patients']['Update'];
 
-export interface ScanAnalysis {
-  id?: string;
-  patient_id: string;
-  scan_date: string;
-  examination_type: string;
-  clinical_info?: string;
-  general_observations: any;
-  findings: any[];
-  possible_conditions: string[];
-  clinical_implications: string;
-  overall_assessment: string;
-  recommendations: string[];
-  next_steps: string[];
-  ai_confidence: number;
-  analysis_version?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+type ScanAnalysis = Database['public']['Tables']['scan_analyses']['Row'];
+type ScanAnalysisInsert = Database['public']['Tables']['scan_analyses']['Insert'];
+type ScanAnalysisUpdate = Database['public']['Tables']['scan_analyses']['Update'];
 
-export interface Feedback {
-  id?: string;
-  analysis_id: string;
-  feedback_text: string;
-  rating: number;
-  created_at?: string;
-}
+type Feedback = Database['public']['Tables']['feedback']['Row'];
+type FeedbackInsert = Database['public']['Tables']['feedback']['Insert'];
+type FeedbackUpdate = Database['public']['Tables']['feedback']['Update'];
 
 export class SupabaseService {
   // Patient Management
